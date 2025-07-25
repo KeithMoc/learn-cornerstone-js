@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progressive Loading in Cornerstone</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --code-bg: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        nav {
+            background-color: var(--secondary);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+        }
+        
+        nav li {
+            margin: 0 15px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        main {
+            padding: 2rem 0;
+        }
+        
+        section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .code-block {
+            background-color: var(--code-bg);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            position: relative;
+        }
+        
+        .code-block pre {
+            white-space: pre-wrap;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: var(--primary);
+        }
+        
+        .diagram {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .diagram img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .benefit-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 3px solid var(--primary);
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .benefit-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        
+        .tabs {
+            margin: 2rem 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab-btn.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background-color: var(--light);
+        }
+        
+        .tab-content {
+            padding: 1.5rem;
+            background: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .progress-indicator {
+            width: 100%;
+            height: 20px;
+            background-color: var(--light);
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            width: 0;
+            transition: width 1.5s ease-in-out;
+            border-radius: 10px;
+        }
+        
+        .loading-stages {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+        }
+        
+        .loading-stage {
+            text-align: center;
+            flex: 1;
+            font-size: 0.8rem;
+            color: var(--dark);
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 0.5rem 0;
+            }
+            
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Progressive Loading in Cornerstone</h1>
+            <p>Learn how to implement efficient image loading for medical imaging applications</p>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#implementation">Implementation</a></li>
+            <li><a href="#strategies">Strategies</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+        </ul>
+    </nav>
+    
+    <main class="container">
+        <section id="introduction">
+            <h2>Introduction to Progressive Loading</h2>
+            <p>Progressive loading in medical imaging is a technique that enables rapid display of large image studies by initially loading essential data and then progressively retrieving more detailed information. This approach significantly improves the user experience by providing immediate visual feedback while the full-quality image is being loaded.</p>
+            
+            <div class="diagram">
+                <canvas id="progressiveLoadingDiagram" width="800" height="300"></canvas>
+                <p><em>Progressive loading visualization: From low to high resolution</em></p>
+            </div>
+            
+            <h3>Benefits of Progressive Loading</h3>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3>Enhanced Workflow Efficiency</h3>
+                    <p>Radiologists can begin reviewing images immediately without waiting for complete high-resolution data to load.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Reduced Wait Times</h3>
+                    <p>Initial image display happens quickly, eliminating frustrating loading screens and improving productivity.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>Remote Diagnostics</h3>
+                    <p>Enables effective telemedicine by providing usable images even on limited bandwidth connections.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="implementation">
+            <h2>Implementing Progressive Loading with Cornerstone</h2>
+            <p>Cornerstone.js provides a robust framework for implementing progressive loading in medical imaging applications. The implementation revolves around three core concepts:</p>
+            
+            <h3>Core Concepts</h3>
+            <ul>
+                <li><strong>Retrieve Configuration</strong>: Defines how image data should be loaded progressively</li>
+                <li><strong>Retrieve Stages</strong>: Specifies the sequence of loading operations</li>
+                <li><strong>Retrieve Options</strong>: Provides fine-grained control over the loading process</li>
+            </ul>
+            
+            <h3>Implementation Example</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <pre><code>// Define a retrieve configuration for progressive loading
+const retrieveConfig = {
+  // Define the stages of loading
+  retrieveStages: [
+    // Stage 1: Load low-resolution image quickly
+    {
+      quality: 'low',
+      imageIdPrefix: 'wadouri:',
+      retrieveOptions: {
+        priority: 0, // Highest priority
+        requestType: 'thumbnail'
+      }
+    },
+    // Stage 2: Load full-resolution image
+    {
+      quality: 'full',
+      imageIdPrefix: 'wadouri:',
+      retrieveOptions: {
+        priority: 1,
+        requestType: 'fullResolution'
+      }
+    }
+  ]
+};
+
+// Add the configuration to the imageRetrieveMetadataProvider
+cornerstone.imageRetrieveMetadataProvider.add(
+  'stackViewport',
+  retrieveConfig
+);</code></pre>
+            </div>
+            
+            <p>This configuration tells Cornerstone to first load a low-resolution version of the image with high priority, followed by the full-resolution version. This approach ensures that users can see and interact with images almost immediately.</p>
+        </section>
+        
+        <section id="strategies">
+            <h2>Progressive Loading Strategies</h2>
+            
+            <div class="tabs">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="stack">Stack Progressive Loading</button>
+                    <button class="tab-btn" data-tab="volume">Volume Progressive Loading</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="stack-tab">
+                        <h3>Stack Progressive Loading</h3>
+                        <p>Stack progressive loading is ideal for traditional 2D image viewing. Cornerstone supports several approaches:</p>
+                        
+                        <h4>HTJ2K Streaming (Single Stage)</h4>
+                        <p>High-Throughput JPEG 2000 (HTJ2K) allows for streaming of image data, enabling progressive quality improvement as more data arrives.</p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn">Copy</button>
+                            <pre><code>// HTJ2K Streaming configuration
+const htj2kStreamingConfig = {
+  retrieveStages: [
+    {
+      quality: 'progressive',
+      imageIdPrefix: 'htj2k:',
+      retrieveOptions: {
+        streaming: true
+      }
+    }
+  ]
+};</code></pre>
+                        </div>
+                        
+                        <h4>HTJ2K Byte Range (Two Stages)</h4>
+                        <p>This approach uses HTTP byte range requests to first fetch a preview image, then the full-quality image.</p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn">Copy</button>
+                            <pre><code>// HTJ2K Byte Range configuration
+const htj2kByteRangeConfig = {
+  retrieveStages: [
+    {
+      quality: 'preview',
+      imageIdPrefix: 'htj2k:',
+      retrieveOptions: {
+        byteRange: [0, 5000],
+        priority: 0
+      }
+    },
+    {
+      quality: 'full',
+      imageIdPrefix: 'htj2k:',
+      retrieveOptions: {
+        priority: 1
+      }
+    }
+  ]
+};</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="volume-tab">
+                        <h3>Volume Progressive Loading</h3>
+                        <p>For 3D volumes, progressive loading can be implemented by prioritizing key slices first, then loading the remaining slices.</p>
+                        
+                        <div class="code-block">
+                            <button class="copy-btn">Copy</button>
+                            <pre><code>// Volume Progressive Loading configuration
+const volumeProgressiveConfig = {
+  retrieveStages: [
+    // Stage 1: Load key slices (e.g., every 10th slice)
+    {
+      quality: 'sparse',
+      imageIdPrefix: 'wadouri:',
+      retrieveOptions: {
+        priority: 0,
+        sliceStep: 10
+      }
+    },
+    // Stage 2: Load remaining slices
+    {
+      quality: 'complete',
+      imageIdPrefix: 'wadouri:',
+      retrieveOptions: {
+        priority: 1,
+        excludeLoadedSlices: true
+      }
+    }
+  ]
+};</code></pre>
+                        </div>
+                        
+                        <p>This approach allows radiologists to begin navigating through a volume immediately, with intermediate slices being filled in as they become available.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-demo">
+                <h3>Interactive Demo</h3>
+                <p>Click the button below to see a simulation of progressive loading:</p>
+                <button id="startDemo" class="btn">Start Demo</button>
+                
+                <div class="progress-indicator">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                
+                <div class="loading-stages">
+                    <div class="loading-stage">Initial Request</div>
+                    <div class="loading-stage">Low Resolution</div>
+                    <div class="loading-stage">Medium Resolution</div>
+                    <div class="loading-stage">Full Resolution</div>
+                </div>
+                
+                <div id="demoImage" class="diagram">
+                    <canvas id="imageCanvas" width="400" height="400"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="best-practices">
+            <h2>Performance and Best Practices</h2>
+            
+            <h3>User Experience Considerations</h3>
+            <p>When implementing progressive loading, it's crucial to consider the user experience. One significant challenge is ensuring users know whether an image is fully loaded or only partially rendered to avoid misinterpretation.</p>
+            
+            <h3>Recommended Best Practices</h3>
+            <ul>
+                <li><strong>Clear Visual Indicators</strong>: Provide loading status indicators to inform users about the current image quality.</li>
+                <li><strong>Quality Notifications</strong>: Display a notification when the image transitions from low to high quality.</li>
+                <li><strong>Prioritize Visible Content</strong>: Load what's in the viewport first, then load content that might be scrolled to next.</li>
+                <li><strong>Cache Effectively</strong>: Implement proper caching strategies to avoid reloading previously viewed images.</li>
+                <li><strong>Network Awareness</strong>: Adjust loading strategies based on available bandwidth.</li>
+            </ul>
+            
+            <div class="code-block">
+                <button class="copy-btn">Copy</button>
+                <pre><code>// Example of implementing a loading indicator
+cornerstone.events.addEventListener('cornerstoneimageloadprogress', function(event) {
+  const { imageId, loaded, total } = event.detail;
+  
+  // Update loading indicator
+  const percentComplete = Math.round((loaded / total) * 100);
+  updateLoadingIndicator(imageId, percentComplete);
+});
+
+function updateLoadingIndicator(imageId, percent) {
+  // Find the element displaying this image
+  const element = document.querySelector(`[data-image-id="${imageId}"]`);
+  
+  if (element) {
+    // Update indicator
+    const indicator = element.querySelector('.loading-indicator');
+    indicator.style.width = `${percent}%`;
+    
+    // Show quality notification when fully loaded
+    if (percent === 100) {
+      showQualityNotification(element, 'Full quality image loaded');
+    }
+  }
+}</code></pre>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>Part of the Cornerstone.js/Cornerstone3D Tutorial Series</p>
+            <p>&copy; 2023 Medical Imaging Tutorials</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Tab functionality
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                
+                // Update active button
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+                
+                // Show active tab content
+                document.querySelectorAll('.tab-pane').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Copy button functionality
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const codeBlock = button.nextElementSibling.textContent;
+                navigator.clipboard.writeText(codeBlock);
+                
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        });
+        
+        // Progressive loading diagram
+        const canvas = document.getElementById('progressiveLoadingDiagram');
+        const ctx = canvas.getContext('2d');
+        
+        function drawProgressiveDiagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw timeline
+            ctx.beginPath();
+            ctx.moveTo(50, 250);
+            ctx.lineTo(750, 250);
+            ctx.strokeStyle = '#2c3e50';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Draw timeline markers
+            const markers = [
+                { x: 50, label: 'Request' },
+                { x: 200, label: 'Low Res' },
+                { x: 400, label: 'Medium Res' },
+                { x: 600, label: 'Full Res' },
+                { x: 750, label: 'Complete' }
+            ];
+            
+            markers.forEach(marker => {
+                // Draw marker line
+                ctx.beginPath();
+                ctx.moveTo(marker.x, 240);
+                ctx.lineTo(marker.x, 260);
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw label
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#2c3e50';
+                ctx.textAlign = 'center';
+                ctx.fillText(marker.label, marker.x, 280);
+            });
+            
+            // Draw image quality representations
+            drawImageQuality(100, 50, 80, 'gray');
+            drawImageQuality(250, 50, 80, '#e74c3c');
+            drawImageQuality(450, 50, 80, '#f39c12');
+            drawImageQuality(650, 50, 80, '#2ecc71');
+        }
+        
+        function drawImageQuality(x, y, size, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x - size/2, y, size, size);
+            
+            // Draw pixelation based on quality
+            if (color === 'gray') {
+                // Loading state
+                ctx.fillStyle = '#ecf0f1';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Loading...', x, y + size/2);
+            } else if (color === '#e74c3c') {
+                // Low res - large pixels
+                drawPixelatedImage(x, y, size, 5);
+            } else if (color === '#f39c12') {
+                // Medium res - medium pixels
+                drawPixelatedImage(x, y, size, 10);
+            } else {
+                // High res - small pixels
+                drawPixelatedImage(x, y, size, 20);
+            }
+        }
+        
+        function drawPixelatedImage(x, y, size, pixelCount) {
+            const pixelSize = size / pixelCount;
+            
+            for (let i = 0; i < pixelCount; i++) {
+                for (let j = 0; j < pixelCount; j++) {
+                    const brightness = Math.random() * 200 + 55;
+                    ctx.fillStyle = `rgb(${brightness}, ${brightness}, ${brightness})`;
+                    ctx.fillRect(
+                        x - size/2 + i * pixelSize, 
+                        y + j * pixelSize, 
+                        pixelSize, 
+                        pixelSize
+                    );
+                }
+            }
+        }
+        
+        // Demo functionality
+        const startDemoBtn = document.getElementById('startDemo');
+        const progressBar = document.getElementById('progressBar');
+        const imageCanvas = document.getElementById('imageCanvas');
+        const imgCtx = imageCanvas.getContext('2d');
+        
+        startDemoBtn.addEventListener('click', () => {
+            startDemoBtn.disabled = true;
+            progressBar.style.width = '0%';
+            
+            // Clear canvas
+            imgCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+            imgCtx.fillStyle = '#f0f0f0';
+            imgCtx.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
+            imgCtx.fillStyle = '#333';
+            imgCtx.font = '20px Arial';
+            imgCtx.textAlign = 'center';
+            imgCtx.fillText('Loading...', imageCanvas.width/2, imageCanvas.height/2);
+            
+            // Simulate progressive loading
+            setTimeout(() => {
+                progressBar.style.width = '25%';
+                drawDemoImage(5); // Very low res
+            }, 500);
+            
+            setTimeout(() => {
+                progressBar.style.width = '50%';
+                drawDemoImage(10); // Low res
+            }, 1500);
+            
+            setTimeout(() => {
+                progressBar.style.width = '75%';
+                drawDemoImage(20); // Medium res
+            }, 2500);
+            
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+                drawDemoImage(40); // High res
+                startDemoBtn.disabled = false;
+            }, 3500);
+        });
+        
+        function drawDemoImage(resolution) {
+            imgCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+            
+            const pixelSize = imageCanvas.width / resolution;
+            
+            // Draw a simulated brain scan with pixelation
+            for (let x = 0; x < resolution; x++) {
+                for (let y = 0; y < resolution; y++) {
+                    // Create a pattern that looks like a brain scan
+                    const centerX = resolution / 2;
+                    const centerY = resolution / 2;
+                    const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+                    
+                    let color;
+                    if (distance < resolution / 3) {
+                        // Brain tissue
+                        const variation = Math.random() * 40;
+                        color = `rgb(${180 + variation}, ${180 + variation}, ${180 + variation})`;
+                    } else if (distance < resolution / 2.5) {
+                        // Skull
+                        const variation = Math.random() * 20;
+                        color = `rgb(${220 + variation}, ${220 + variation}, ${220 + variation})`;
+                    } else {
+                        // Background
+                        color = '#000';
+                    }
+                    
+                    imgCtx.fillStyle = color;
+                    imgCtx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                }
+            }
+            
+            // Add quality indicator
+            imgCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            imgCtx.fillRect(10, 10, 150, 30);
+            imgCtx.fillStyle = '#333';
+            imgCtx.font = '14px Arial';
+            imgCtx.textAlign = 'left';
+            imgCtx.fillText(`Resolution: ${resolution}x${resolution}`, 20, 30);
+        }
+        
+        // Initialize diagrams on load
+        window.addEventListener('load', () => {
+            drawProgressiveDiagram();
+            
+            // Initial demo image
+            imgCtx.fillStyle = '#f0f0f0';
+            imgCtx.fillRect(0, 0, imageCanvas.width, imageCanvas.height);
+            imgCtx.fillStyle = '#333';
+            imgCtx.font = '16px Arial';
+            imgCtx.textAlign = 'center';
+            imgCtx.fillText('Click \"Start Demo\" to see progressive loading', 
+                           imageCanvas.width/2, imageCanvas.height/2);
+        });
+    </script>
+</body>
+</html>
