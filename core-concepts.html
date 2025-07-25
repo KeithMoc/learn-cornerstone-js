@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Concepts of Cornerstone.js & Cornerstone3D</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        section {
+            margin-bottom: 3rem;
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin: 1rem 0;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .tab-container {
+            margin: 2rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: none;
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .diagram {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .diagram-canvas {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .reference {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--primary);
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                margin-bottom: 5px;
+                border-radius: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Core Concepts of Cornerstone.js & Cornerstone3D</h1>
+        <p>Understanding the foundation of web-based medical imaging</p>
+    </header>
+    
+    <div class="container">
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Cornerstone.js and Cornerstone3D comprise a suite of JavaScript libraries designed specifically for developing web-based medical imaging applications. These libraries provide developers with the tools needed to build high-performance, interactive medical imaging viewers that run directly in web browsers.</p>
+            <p>Whether you're building a simple DICOM viewer or a complex multi-modality workstation, Cornerstone provides the foundation for rendering, manipulating, and interacting with medical images in both 2D and 3D environments. <span class="reference">[ref_1]</span></p>
+            <button class="btn" id="learnMoreBtn">Learn More</button>
+        </section>
+        
+        <section id="architecture">
+            <h2>Key Architectural Components</h2>
+            <p>Cornerstone's architecture is modular and extensible, designed to handle the complex requirements of medical imaging applications.</p>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <button class="tab active" onclick="openTab(event, 'rendering')">Rendering Engine</button>
+                    <button class="tab" onclick="openTab(event, 'viewports')">Viewports</button>
+                    <button class="tab" onclick="openTab(event, 'loaders')">Image & Volume Loaders</button>
+                    <button class="tab" onclick="openTab(event, 'cache')">Cache Management</button>
+                    <button class="tab" onclick="openTab(event, 'tools')">Tools & Annotations</button>
+                    <button class="tab" onclick="openTab(event, 'workers')">Web Workers</button>
+                </div>
+                
+                <div id="rendering" class="tab-content active">
+                    <h3>Rendering Engine</h3>
+                    <p>The core of Cornerstone that manages viewports and handles the actual rendering of medical images. It leverages WebGL for hardware-accelerated rendering, supporting both GPU and CPU rendering paths for optimal performance across different devices. <span class="reference">[ref_2]</span></p>
+                </div>
+                
+                <div id="viewports" class="tab-content">
+                    <h3>Viewports</h3>
+                    <p>Display areas for images that can be configured for different orientations (axial, sagittal, coronal) and rendering modes like Maximum Intensity Projection (MIP). Viewports handle the transformation of image data into visible pixels on the screen. <span class="reference">[ref_3]</span></p>
+                </div>
+                
+                <div id="loaders" class="tab-content">
+                    <h3>Image and Volume Loaders</h3>
+                    <p>Responsible for fetching, parsing, and decoding image data from various sources. These loaders handle different formats and protocols, enabling Cornerstone to work with DICOM, NIFTI, and other medical imaging formats. <span class="reference">[ref_4]</span></p>
+                </div>
+                
+                <div id="cache" class="tab-content">
+                    <h3>Cache Management</h3>
+                    <p>Oversees memory usage to prevent performance issues when working with large datasets. The cache system intelligently manages which images are kept in memory and which are purged when memory limits are reached. <span class="reference">[ref_5]</span></p>
+                </div>
+                
+                <div id="tools" class="tab-content">
+                    <h3>Tools and Annotations</h3>
+                    <p>Provide interactivity like zoom, pan, and measurements. The tools library allows users to interact with images and create annotations such as length measurements, angle measurements, and region of interest markings. <span class="reference">[ref_6]</span></p>
+                </div>
+                
+                <div id="workers" class="tab-content">
+                    <h3>Web Workers</h3>
+                    <p>Enhance performance by running intensive tasks in background threads. This prevents UI freezing during computationally expensive operations like image processing or volume rendering. <span class="reference">[ref_7]</span></p>
+                </div>
+            </div>
+            
+            <div class="diagram">
+                <h3>Cornerstone Architecture Overview</h3>
+                <canvas id="architectureDiagram" class="diagram-canvas"></canvas>
+            </div>
+        </section>
+        
+        <section id="data-flow">
+            <h2>Data Flow and Structures</h2>
+            <p>Understanding how data moves through Cornerstone and the key data structures is essential for effective development.</p>
+            
+            <h3>Data Flow Overview</h3>
+            <p>Medical imaging data in Cornerstone follows a path from data source to rendered pixels:</p>
+            <ol>
+                <li>Image Loaders fetch data based on ImageIds</li>
+                <li>Data is processed and cached</li>
+                <li>Rendering Engine transforms data for display</li>
+                <li>User interacts via the Tools Library</li>
+            </ol>
+            
+            <div class="diagram">
+                <h3>Data Flow Visualization</h3>
+                <canvas id="dataFlowDiagram" class="diagram-canvas"></canvas>
+            </div>
+            
+            <h3>Essential Data Structures</h3>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🔗</div>
+                    <h3>ImageId</h3>
+                    <p>A unique URL-like identifier for an image that tells Cornerstone how to retrieve the image data. Format typically includes protocol, data source, and parameters. <span class="reference">[ref_8]</span></p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">📥</div>
+                    <h3>Image Loaders</h3>
+                    <p>Functions that fetch image data based on an ImageId. They handle the retrieval, decoding, and preparation of image data for rendering. <span class="reference">[ref_9]</span></p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">📋</div>
+                    <h3>Metadata Providers</h3>
+                    <p>Handle non-pixel data like patient information, study details, and image acquisition parameters. <span class="reference">[ref_10]</span></p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">📊</div>
+                    <h3>Volumes</h3>
+                    <p>A 3D dataset composed of multiple image slices with defined spatial properties. Cornerstone3D uses volumes as the foundation for 3D rendering and MPR views. <span class="reference">[ref_11]</span></p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="advanced">
+            <h2>Advanced Concepts</h2>
+            <p>Beyond the core components, Cornerstone offers advanced features for complex medical imaging applications.</p>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">🔄</div>
+                    <h3>Synchronizers</h3>
+                    <p>Coordinate interactions across multiple viewports, allowing actions in one viewport to be reflected in others. Essential for multi-planar reconstructions and comparative studies. <span class="reference">[ref_12]</span></p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">✂️</div>
+                    <h3>Segmentation</h3>
+                    <p>Support for rendering and editing segmentations, allowing regions of interest to be highlighted and analyzed. Cornerstone3D provides tools for creating, editing, and visualizing segmentation data. <span class="reference">[ref_13]</span></p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <script>
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabContents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Architecture diagram
+        const architectureCanvas = document.getElementById('architectureDiagram');
+        const archCtx = architectureCanvas.getContext('2d');
+        
+        function drawArchitectureDiagram() {
+            architectureCanvas.width = architectureCanvas.offsetWidth;
+            architectureCanvas.height = architectureCanvas.offsetHeight;
+            
+            const width = architectureCanvas.width;
+            const height = architectureCanvas.height;
+            
+            // Clear canvas
+            archCtx.clearRect(0, 0, width, height);
+            
+            // Draw rendering engine (center)
+            archCtx.fillStyle = '#3498db';
+            roundRect(archCtx, width/2 - 100, height/2 - 40, 200, 80, 10, true);
+            archCtx.fillStyle = 'white';
+            archCtx.font = '16px Arial';
+            archCtx.textAlign = 'center';
+            archCtx.fillText('Rendering Engine', width/2, height/2 + 5);
+            
+            // Draw viewports (top)
+            archCtx.fillStyle = '#2ecc71';
+            roundRect(archCtx, width/2 - 80, height/4 - 30, 160, 60, 10, true);
+            archCtx.fillStyle = 'white';
+            archCtx.fillText('Viewports', width/2, height/4 + 5);
+            
+            // Draw loaders (left)
+            archCtx.fillStyle = '#e74c3c';
+            roundRect(archCtx, width/4 - 80, height/2 - 30, 160, 60, 10, true);
+            archCtx.fillStyle = 'white';
+            archCtx.fillText('Image Loaders', width/4, height/2 + 5);
+            
+            // Draw tools (right)
+            archCtx.fillStyle = '#f39c12';
+            roundRect(archCtx, 3*width/4 - 80, height/2 - 30, 160, 60, 10, true);
+            archCtx.fillStyle = 'white';
+            archCtx.fillText('Tools Library', 3*width/4, height/2 + 5);
+            
+            // Draw cache (bottom)
+            archCtx.fillStyle = '#9b59b6';
+            roundRect(archCtx, width/2 - 80, 3*height/4 - 30, 160, 60, 10, true);
+            archCtx.fillStyle = 'white';
+            archCtx.fillText('Cache Management', width/2, 3*height/4 + 5);
+            
+            // Draw connections
+            archCtx.strokeStyle = '#2c3e50';
+            archCtx.lineWidth = 2;
+            
+            // Viewport to Rendering Engine
+            archCtx.beginPath();
+            archCtx.moveTo(width/2, height/4 + 30);
+            archCtx.lineTo(width/2, height/2 - 40);
+            archCtx.stroke();
+            
+            // Loaders to Rendering Engine
+            archCtx.beginPath();
+            archCtx.moveTo(width/4 + 80, height/2);
+            archCtx.lineTo(width/2 - 100, height/2);
+            archCtx.stroke();
+            
+            // Rendering Engine to Tools
+            archCtx.beginPath();
+            archCtx.moveTo(width/2 + 100, height/2);
+            archCtx.lineTo(3*width/4 - 80, height/2);
+            archCtx.stroke();
+            
+            // Rendering Engine to Cache
+            archCtx.beginPath();
+            archCtx.moveTo(width/2, height/2 + 40);
+            archCtx.lineTo(width/2, 3*height/4 - 30);
+            archCtx.stroke();
+        }
+        
+        // Data flow diagram
+        const dataFlowCanvas = document.getElementById('dataFlowDiagram');
+        const dataCtx = dataFlowCanvas.getContext('2d');
+        
+        function drawDataFlowDiagram() {
+            dataFlowCanvas.width = dataFlowCanvas.offsetWidth;
+            dataFlowCanvas.height = dataFlowCanvas.offsetHeight;
+            
+            const width = dataFlowCanvas.width;
+            const height = dataFlowCanvas.height;
+            
+            // Clear canvas
+            dataCtx.clearRect(0, 0, width, height);
+            
+            // Draw flow steps
+            const steps = [
+                { x: width*0.1, y: height/2, color: '#3498db', text: 'Data Source' },
+                { x: width*0.3, y: height/2, color: '#e74c3c', text: 'Image Loader' },
+                { x: width*0.5, y: height/2, color: '#9b59b6', text: 'Cache' },
+                { x: width*0.7, y: height/2, color: '#2ecc71', text: 'Rendering Engine' },
+                { x: width*0.9, y: height/2, color: '#f39c12', text: 'Display' }
+            ];
+            
+            // Draw boxes
+            for (let step of steps) {
+                dataCtx.fillStyle = step.color;
+                roundRect(dataCtx, step.x - 60, step.y - 30, 120, 60, 10, true);
+                dataCtx.fillStyle = 'white';
+                dataCtx.font = '14px Arial';
+                dataCtx.textAlign = 'center';
+                dataCtx.fillText(step.text, step.x, step.y + 5);
+            }
+            
+            // Draw arrows
+            dataCtx.strokeStyle = '#2c3e50';
+            dataCtx.lineWidth = 2;
+            
+            for (let i = 0; i < steps.length - 1; i++) {
+                drawArrow(dataCtx, steps[i].x + 60, steps[i].y, steps[i+1].x - 60, steps[i+1].y);
+            }
+        }
+        
+        // Helper function to draw rounded rectangles
+        function roundRect(ctx, x, y, width, height, radius, fill) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) {
+                ctx.fill();
+            } else {
+                ctx.stroke();
+            }
+        }
+        
+        // Helper function to draw arrows
+        function drawArrow(ctx, fromX, fromY, toX, toY) {
+            const headLength = 10;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI/6), toY - headLength * Math.sin(angle - Math.PI/6));
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI/6), toY - headLength * Math.sin(angle + Math.PI/6));
+            ctx.stroke();
+        }
+        
+        // Initialize diagrams on load and resize
+        window.addEventListener('load', function() {
+            drawArchitectureDiagram();
+            drawDataFlowDiagram();
+        });
+        
+        window.addEventListener('resize', function() {
+            drawArchitectureDiagram();
+            drawDataFlowDiagram();
+        });
+        
+        // Button interaction
+        document.getElementById('learnMoreBtn').addEventListener('click', function() {
+            alert('Thank you for your interest! For more detailed information, please refer to the official Cornerstone documentation.');
+        });
+    </script>
+</body>
+</html>
