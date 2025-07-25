@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tools & Ecosystem - Cornerstone.js and Cornerstone3D</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        nav {
+            background-color: var(--secondary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        nav li {
+            padding: 0.5rem 1rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            color: var(--primary);
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .tool-card {
+            background-color: var(--light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #e3e8ec;
+        }
+        
+        .tool-card h3 {
+            margin-top: 0;
+            color: var(--secondary);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 1rem;
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-item {
+            background-color: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+        
+        .feature-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin: 2rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Tools & Ecosystem</h1>
+            <p>A comprehensive guide to Cornerstone.js and Cornerstone3D</p>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#rendering">Rendering</a></li>
+            <li><a href="#manipulation">Manipulation</a></li>
+            <li><a href="#annotation">Annotation</a></li>
+            <li><a href="#segmentation">Segmentation</a></li>
+            <li><a href="#synchronization">Synchronization</a></li>
+            <li><a href="#setup">Setup</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>Cornerstone3D provides a rich ecosystem of tools and utilities for medical imaging visualization and analysis. Built on modern web technologies, it offers a comprehensive framework for developing advanced medical imaging applications that run directly in the browser.</p>
+            <p>The ecosystem includes rendering engines, manipulation tools, annotation capabilities, segmentation features, and synchronization utilities that work together to create powerful medical imaging applications.</p>
+            <div class="feature-list">
+                <span class="feature-item">Web-based</span>
+                <span class="feature-item">Zero footprint</span>
+                <span class="feature-item">High performance</span>
+                <span class="feature-item">DICOM compatible</span>
+                <span class="feature-item">Open source</span>
+            </div>
+        </section>
+        
+        <section id="rendering">
+            <h2>Rendering Capabilities</h2>
+            <p>Cornerstone3D's rendering engine provides powerful visualization capabilities for medical imaging data, supporting various viewport types and rendering techniques.</p>
+            
+            <h3>Viewport Types</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>Stack Viewport</h3>
+                    <p>For traditional 2D image stacks with efficient memory usage and fast rendering.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Volume Viewport</h3>
+                    <p>For volumetric data rendering with MPR (Multi-Planar Reconstruction) capabilities.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Volume 3D Viewport</h3>
+                    <p>For advanced 3D volume rendering with customizable transfer functions.</p>
+                </div>
+            </div>
+            
+            <h3>Key Features</h3>
+            <ul>
+                <li><strong>Multiple Transfer Syntaxes:</strong> Support for various DICOM transfer syntaxes including compressed formats.</li>
+                <li><strong>Real-time Streaming:</strong> Progressive loading and rendering of large datasets.</li>
+                <li><strong>Multi-Planar Reconstructions:</strong> Axial, sagittal, coronal, and oblique views from volumetric data.</li>
+                <li><strong>Fusion Capabilities:</strong> Overlay and fusion of different imaging modalities (PET/CT, MR/CT).</li>
+                <li><strong>Color Image Support:</strong> Full rendering of color images including RGB and YBR formats.</li>
+                <li><strong>CPU Fallback:</strong> Graceful degradation to CPU rendering when WebGL is unavailable.</li>
+                <li><strong>Calibration:</strong> Tools for pixel spacing calibration and measurements.</li>
+            </ul>
+            
+            <div class="chart-container" id="renderingChart">
+                <!-- Chart will be rendered here by JavaScript -->
+            </div>
+        </section>
+        
+        <section id="manipulation">
+            <h2>Manipulation Tools</h2>
+            <p>Cornerstone3D provides a comprehensive set of interactive tools for image manipulation, allowing users to navigate and adjust medical images with precision.</p>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>ZoomTool</h3>
+                    <p>Enables zooming in and out of images using mouse drag or touch gestures.</p>
+                    <button class="btn" onclick="showToolDemo('ZoomTool')">See Example</button>
+                </div>
+                <div class="tool-card">
+                    <h3>PanTool</h3>
+                    <p>Allows panning/moving the image within the viewport.</p>
+                    <button class="btn" onclick="showToolDemo('PanTool')">See Example</button>
+                </div>
+                <div class="tool-card">
+                    <h3>StackScrollMouseWheelTool</h3>
+                    <p>Navigate through image stacks using the mouse wheel or equivalent touch gestures.</p>
+                    <button class="btn" onclick="showToolDemo('StackScrollMouseWheelTool')">See Example</button>
+                </div>
+                <div class="tool-card">
+                    <h3>WindowLevelTool</h3>
+                    <p>Adjust brightness and contrast of medical images for optimal visualization.</p>
+                    <button class="btn" onclick="showToolDemo('WindowLevelTool')">See Example</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="annotation">
+            <h2>Annotation Tools</h2>
+            <p>Cornerstone3D offers a rich set of annotation and measurement tools that enable precise quantitative analysis of medical images.</p>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>LengthTool</h3>
+                    <p>Measure distances between two points.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>AngleTool</h3>
+                    <p>Measure angles between lines.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>EllipticalROITool</h3>
+                    <p>Create elliptical regions of interest with area measurements.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>RectangleROITool</h3>
+                    <p>Create rectangular regions of interest with area measurements.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>CircleROITool</h3>
+                    <p>Create circular regions of interest with area measurements.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>PlanarFreehandROITool</h3>
+                    <p>Create custom-shaped regions of interest.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>BidirectionalTool</h3>
+                    <p>Measure perpendicular dimensions, commonly used in oncology.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>ArrowAnnotateTool</h3>
+                    <p>Place arrows with text annotations.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>CobbAngleTool</h3>
+                    <p>Measure angles between lines, commonly used for spinal measurements.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>ProbeTool</h3>
+                    <p>Display pixel value information at specific points.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>SplineROITool</h3>
+                    <p>Create smooth curve-based regions of interest.</p>
+                </div>
+            </div>
+            
+            <h3>Features</h3>
+            <ul>
+                <li>Persistent annotations across viewport changes</li>
+                <li>Serialization for storage and retrieval</li>
+                <li>Customizable appearance and behavior</li>
+                <li>Support for both 2D and 3D annotations</li>
+            </ul>
+        </section>
+        
+        <section id="segmentation">
+            <h2>Segmentation Tools</h2>
+            <p>Cornerstone3D provides advanced segmentation capabilities for identifying and analyzing regions of interest in medical images.</p>
+            
+            <h3>Key Segmentation Features</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>Polymorphic Segmentation</h3>
+                    <p>Support for multiple segmentation representations including contours, surfaces, and labelmaps.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Labelmap Interpolation</h3>
+                    <p>Automatic interpolation between segmented slices to create smooth 3D segmentations.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Segmentation Rendering</h3>
+                    <p>Visualization of segmentations as overlays, with customizable opacity and color.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Segmentation Tools</h3>
+                    <p>Brush, eraser, scissors, and other interactive segmentation tools.</p>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Brush Tool</td>
+                        <td>Paint segmentations directly on images</td>
+                        <td>Manual segmentation of structures</td>
+                    </tr>
+                    <tr>
+                        <td>Eraser Tool</td>
+                        <td>Remove parts of segmentations</td>
+                        <td>Correction of segmentation errors</td>
+                    </tr>
+                    <tr>
+                        <td>Scissors Tool</td>
+                        <td>Create segmentations by drawing contours</td>
+                        <td>Precise boundary delineation</td>
+                    </tr>
+                    <tr>
+                        <td>Threshold Tool</td>
+                        <td>Create segmentations based on pixel value thresholds</td>
+                        <td>Quick segmentation of high-contrast structures</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section id="synchronization">
+            <h2>Synchronization Features</h2>
+            <p>Cornerstone3D provides powerful synchronization capabilities that enable coordinated interaction across multiple viewports.</p>
+            
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h3>WindowLevel Synchronizer</h3>
+                    <p>Synchronize brightness and contrast settings across multiple viewports.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Camera Synchronizer</h3>
+                    <p>Coordinate camera positions, zoom levels, and orientations across viewports.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Stack Synchronizer</h3>
+                    <p>Synchronize image stack positions across multiple viewports.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Custom Synchronizers</h3>
+                    <p>Create custom synchronization behaviors for specific clinical workflows.</p>
+                </div>
+            </div>
+            
+            <p>Synchronization features are particularly useful for comparing different series, modalities, or time points of the same patient study.</p>
+        </section>
+        
+        <section id="setup">
+            <h2>Setting Up Your Development Environment</h2>
+            <p>Getting started with Cornerstone3D development is straightforward. Here's a high-level overview of setting up your development environment:</p>
+            
+            <h3>Prerequisites</h3>
+            <ul>
+                <li><strong>Node.js and npm:</strong> Required for package management and build tools.</li>
+                <li><strong>Code Editor:</strong> Visual Studio Code, WebStorm, or any modern code editor.</li>
+                <li><strong>Web Browser:</strong> Chrome or Firefox with developer tools for debugging.</li>
+            </ul>
+            
+            <h3>Basic Setup Steps</h3>
+            <ol>
+                <li>Create a new project directory</li>
+                <li>Initialize a new npm project: <code>npm init -y</code></li>
+                <li>Install Cornerstone3D packages:
+                    <pre>npm install @cornerstonejs/core @cornerstonejs/tools @cornerstonejs/streaming-image-volume-loader</pre>
+                </li>
+                <li>Set up a basic HTML file with a viewport container</li>
+                <li>Initialize Cornerstone3D in your JavaScript code</li>
+                <li>Load and display your first medical image</li>
+            </ol>
+            
+            <button class="btn" id="showSampleCode">View Sample Code</button>
+            <div id="sampleCode" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+                <pre>
+// Initialize Cornerstone3D
+await cornerstone3D.init();
+
+// Create a viewport
+const element = document.getElementById('viewport');
+const viewport = cornerstone3D.createViewport({
+  element,
+  type: cornerstone3D.Enums.ViewportType.STACK
+});
+
+// Load and display an image
+const imageId = 'wadouri:https://example.com/image.dcm';
+await viewport.setStack([imageId]);
+                </pre>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Cornerstone3D Tutorial Website</p>
+            <p>An open-source medical imaging visualization platform</p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple chart rendering
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample chart for rendering capabilities
+            const renderingChart = document.getElementById('renderingChart');
+            renderingChart.innerHTML = `
+                <div style="display: flex; height: 100%; align-items: flex-end; justify-content: space-around;">
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 15%;">
+                        <div style="background-color: #3498db; width: 100%; height: 60%; margin-bottom: 10px;"></div>
+                        <span>Stack</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 15%;">
+                        <div style="background-color: #2ecc71; width: 100%; height: 80%; margin-bottom: 10px;"></div>
+                        <span>Volume</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 15%;">
+                        <div style="background-color: #e74c3c; width: 100%; height: 90%; margin-bottom: 10px;"></div>
+                        <span>Volume 3D</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 15%;">
+                        <div style="background-color: #f39c12; width: 100%; height: 70%; margin-bottom: 10px;"></div>
+                        <span>MPR</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 15%;">
+                        <div style="background-color: #9b59b6; width: 100%; height: 50%; margin-bottom: 10px;"></div>
+                        <span>Fusion</span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">Rendering Performance Comparison</div>
+            `;
+            
+            // Tool demo functionality
+            window.showToolDemo = function(toolName) {
+                alert(`Demo for ${toolName} would be shown here in a real application.`);
+            };
+            
+            // Sample code toggle
+            document.getElementById('showSampleCode').addEventListener('click', function() {
+                const codeBlock = document.getElementById('sampleCode');
+                if (codeBlock.style.display === 'none') {
+                    codeBlock.style.display = 'block';
+                    this.textContent = 'Hide Sample Code';
+                } else {
+                    codeBlock.style.display = 'none';
+                    this.textContent = 'View Sample Code';
+                }
+            });
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 60,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
